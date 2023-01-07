@@ -2,6 +2,7 @@ package kyoongdev.kyoongdevspring.modules.member.dao;
 
 
 import java.util.List;
+import java.util.Optional;
 import kyoongdev.kyoongdevspring.modules.model.Member;
 
 public interface MemberRepository {
@@ -10,9 +11,9 @@ public interface MemberRepository {
 
   List<Member> getAll();
 
-  Member getOne(Long id);
+  Optional<Member> getOne(Long id);
 
-  Member getOneByName(String name);
+  Optional<Member> getOneByName(String name);
 
 
 }
