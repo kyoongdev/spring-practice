@@ -28,7 +28,7 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 
   public ApiInfo apiInfo() {
     return new ApiInfoBuilder()
-        .title("SpringBoot Practice Rest API Documentation")
+        .title("Kyoongdev SpringBoot Practice")
         .description("springboot rest api practice.")
         .version("0.1")
         .build();
