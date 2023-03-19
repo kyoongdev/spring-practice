@@ -2,18 +2,20 @@ package kyoongdev.kyoongdevspring.modules.member.dao;
 
 
 import java.util.List;
-import java.util.Optional;
-import kyoongdev.kyoongdevspring.modules.model.Member;
+import kyoongdev.kyoongdevspring.modules.member.dto.UpsertUserDTO;
+import kyoongdev.kyoongdevspring.modules.member.dto.UserDTO;
+import kyoongdev.kyoongdevspring.modules.member.model.Member;
 
 public interface MemberRepository {
 
-  Long save(Member member);
+  Long create(UpsertUserDTO member);
 
-  List<Member> getAll();
+  List<UserDTO> getAll();
 
-  Optional<Member> getOne(Long id);
+  UserDTO getOne(Long id);
 
-  Optional<Member> getOneByName(String name);
+  void update(Long id, UpsertUserDTO member);
 
+  void delete(Long id);
 
 }
