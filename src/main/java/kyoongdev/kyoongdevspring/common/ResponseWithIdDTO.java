@@ -1,20 +1,14 @@
 package kyoongdev.kyoongdevspring.common;
 
+
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
+@Data
 public class ResponseWithIdDTO {
 
-  private Long id;
+    private String id;
 
-  public ResponseWithIdDTO(Long id) {
-    this.id = id;
-  }
-
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
 }

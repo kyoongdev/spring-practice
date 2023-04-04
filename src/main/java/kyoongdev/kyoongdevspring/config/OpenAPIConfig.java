@@ -11,15 +11,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenAPIConfig {
-
-
-  @Bean
-  public OpenAPI openApi() {
-    return new OpenAPI()
-        .info(new Info()
-            .title("Kyoongdev API")
-            .description("Flight Kyoongdev Spring boot practice")
-            .version("v1.0")
-        );
-  }
+    @Bean
+    public OpenAPI openApi() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Kyoongdev API")
+                        .description("Flight Kyoongdev Spring boot practice")
+                        .version("v1.0")
+                );
+    }
 }
