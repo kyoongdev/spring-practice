@@ -3,6 +3,8 @@ package kyoongdev.kyoongdevspring.modules.post.service;
 
 import kyoongdev.kyoongdevspring.common.PagingDTO;
 import kyoongdev.kyoongdevspring.common.ResponseWithIdDTO;
+import kyoongdev.kyoongdevspring.common.exception.CustomException;
+import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.post.dto.CreatePostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.PostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.UpdatePostDTO;
@@ -23,66 +25,70 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class PostService {
-    PostRepository postRepository;
-    PostMapper postMapper;
-    UserService userService;
 
-    @Autowired
-    PostService(PostRepository postRepository, UserService userService, PostMapper postMapper) {
-        this.postRepository = postRepository;
-        this.postMapper = postMapper;
-        this.userService = userService;
+  PostRepository postRepository;
+  PostMapper postMapper;
+  UserService userService;
+
+  @Autowired
+  PostService(PostRepository postRepository, UserService userService, PostMapper postMapper) {
+    this.postRepository = postRepository;
+    this.postMapper = postMapper;
+    this.userService = userService;
+  }
+
+  public Post findPostById(String id) {
+    return postRepository.findById(id)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "게시글을 찾을 수 없습니다."));
+  }
+
+  public PagingDTO<PostDTO> getPosts(Pageable pageable) {
+    Long count = postRepository.countBy();
+    List<PostDTO> posts = postRepository.findAll(pageable).stream().map(PostDTO::new)
+        .collect(toList());
+
+    return PagingDTO.<PostDTO>builder().data(posts).paging(PagingDTO.getPagination(pageable, count))
+        .build();
+  }
+
+  public PagingDTO<PostDTO> getPostsByUserId(Pageable pageable, String userId) {
+    Long count = postRepository.countBy();
+    List<PostDTO> posts = postRepository.findAllByUserId(pageable, userId).stream()
+        .map(PostDTO::new).collect(toList());
+
+    return PagingDTO.<PostDTO>builder().data(posts).paging(PagingDTO.getPagination(pageable, count))
+        .build();
+  }
+
+  public PostDTO getPostWithDTO(String id) {
+    Optional<Post> post = postRepository.findById(id);
+    if (post.isEmpty()) {
+      throw new CustomException(ErrorCode.NOT_FOUND, "게시글을 찾을 수 없습니다.");
     }
 
-    public Post findPostById(String id) {
-        return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Post not found"));
-    }
+    return post.map(PostDTO::new).get();
+  }
 
-    public PagingDTO<PostDTO> getPosts(Pageable pageable) {
-        Long count = postRepository.countBy();
-        List<PostDTO> posts = postRepository.findAll(pageable).stream().map(PostDTO::new).collect(toList());
+  public ResponseWithIdDTO createPost(CreatePostDTO postDTO) {
+    User user = userService.findUserById(postDTO.getUserId());
 
-        return PagingDTO.<PostDTO>builder().data(posts).paging(PagingDTO.getPagination(pageable, count)).build();
-    }
+    Post post = postRepository.save(Post.builder()
+        .title(postDTO.getTitle())
+        .content(postDTO.getContent())
+        .user(user)
+        .build());
 
-    public PagingDTO<PostDTO> getPostsByUserId(Pageable pageable, String userId) {
-        Long count = postRepository.countBy();
-        List<PostDTO> posts = postRepository.findAllByUserId(pageable, userId).stream().map(PostDTO::new).collect(toList());
+    return ResponseWithIdDTO.builder().id(post.getId()).build();
+  }
 
-        return PagingDTO.<PostDTO>builder().data(posts).paging(PagingDTO.getPagination(pageable, count)).build();
-    }
+  public void updatePost(String id, UpdatePostDTO postDTO) {
+    Post post = findPostById(id);
+    postMapper.updatePostFromRequest(postDTO, post);
 
-    public PostDTO getPostWithDTO(String id) {
-        Optional<Post> post = postRepository.findById(id);
-        if (post.isEmpty()) {
-            throw new NotFoundException("Post not found");
-        }
+    postRepository.save(post);
+  }
 
-        return post.map(PostDTO::new).get();
-    }
-
-    public ResponseWithIdDTO createPost(CreatePostDTO postDTO) {
-        User user = userService.findUserById(postDTO.getUserId());
-
-
-        Post post = postRepository.save(Post.builder()
-                .title(postDTO.getTitle())
-                .content(postDTO.getContent())
-                .user(user)
-                .build());
-
-        return ResponseWithIdDTO.builder().id(post.getId()).build();
-    }
-
-    public void updatePost(String id, UpdatePostDTO postDTO) {
-        Post post = findPostById(id);
-        postMapper.updatePostFromRequest(postDTO, post);
-
-
-        postRepository.save(post);
-    }
-
-    public void deletePost(String id) {
-        postRepository.deleteById(id);
-    }
+  public void deletePost(String id) {
+    postRepository.deleteById(id);
+  }
 }

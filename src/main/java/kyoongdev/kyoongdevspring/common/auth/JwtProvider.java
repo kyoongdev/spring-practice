@@ -1,4 +1,4 @@
-package kyoongdev.kyoongdevspring.common;
+package kyoongdev.kyoongdevspring.common.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

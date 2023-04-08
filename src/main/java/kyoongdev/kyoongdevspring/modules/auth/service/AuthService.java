@@ -1,7 +1,9 @@
 package kyoongdev.kyoongdevspring.modules.auth.service;
 
-import kyoongdev.kyoongdevspring.common.JwtProvider;
+import kyoongdev.kyoongdevspring.common.auth.JwtProvider;
 import kyoongdev.kyoongdevspring.common.ResponseWithIdDTO;
+import kyoongdev.kyoongdevspring.common.exception.CustomException;
+import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.auth.dto.LoginDTO;
 import kyoongdev.kyoongdevspring.modules.auth.dto.TokenDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.CreateUserDTO;
@@ -13,33 +15,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    JwtProvider jwtProvider;
-    UserService userService;
-    PasswordEncoder passwordEncoder;
 
-    @Autowired
-    AuthService(JwtProvider jwtProvider, UserService userService, PasswordEncoder passwordEncoder) {
-        this.jwtProvider = jwtProvider;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+  JwtProvider jwtProvider;
+  UserService userService;
+  PasswordEncoder passwordEncoder;
+
+  @Autowired
+  AuthService(JwtProvider jwtProvider, UserService userService, PasswordEncoder passwordEncoder) {
+    this.jwtProvider = jwtProvider;
+    this.userService = userService;
+    this.passwordEncoder = passwordEncoder;
+  }
+
+  public TokenDTO login(LoginDTO props) {
+    UserDetailDTO user = this.userService.findUserByEmail(props.getEmail());
+
+    if (!user.checkPassword(props.getPassword(), this.passwordEncoder)) {
+      throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호가 틀렸습니다.");
     }
 
-    public TokenDTO login(LoginDTO props) {
-        UserDetailDTO user = this.userService.findUserByEmail(props.getEmail());
+    return jwtProvider.generateToken(user.getId());
+  }
 
-        if (!user.checkPassword(props.getPassword(), this.passwordEncoder)) {
-            throw new IllegalArgumentException("Password is not correct");
-        }
+  public TokenDTO register(CreateUserDTO props) {
+    ResponseWithIdDTO user = this.userService.createUser(props);
 
-        return jwtProvider.generateToken(user.getId());
-    }
-
-    public TokenDTO register(CreateUserDTO props) {
-        ResponseWithIdDTO user = this.userService.createUser(props);
-
-
-        return jwtProvider.generateToken(user.getId());
-    }
+    return jwtProvider.generateToken(user.getId());
+  }
 
 
 }
