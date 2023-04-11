@@ -8,21 +8,19 @@ import java.util.Optional;
 
 import kyoongdev.kyoongdevspring.common.PagingDTO;
 import kyoongdev.kyoongdevspring.common.ResponseWithIdDTO;
-import kyoongdev.kyoongdevspring.common.exception.CustomException;
-import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.user.dto.CreateUserDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.UpdateUserDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.UserDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.UserDetailDTO;
 import kyoongdev.kyoongdevspring.modules.user.entity.User;
+import kyoongdev.kyoongdevspring.modules.user.exception.UserErrorCode;
+import kyoongdev.kyoongdevspring.modules.user.exception.UserException;
 import kyoongdev.kyoongdevspring.modules.user.repository.UserMapper;
 import kyoongdev.kyoongdevspring.modules.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import org.webjars.NotFoundException;
 
 
 @Service
@@ -44,7 +42,7 @@ public class UserService {
   public User findUserById(String id) {
     Optional<User> user = userRepository.findById(id);
     if (user.isEmpty()) {
-      throw new CustomException(ErrorCode.NOT_FOUND, "유저를 찾을 수 없습니다.");
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
 
     return user.get();
@@ -54,7 +52,7 @@ public class UserService {
   public UserDetailDTO findUserByEmail(String email) {
     Optional<User> user = userRepository.findByEmail(email);
     if (user.isEmpty()) {
-      throw new CustomException(ErrorCode.NOT_FOUND, "유저를 찾을 수 없습니다.");
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
 
     return UserDetailDTO.builder()
@@ -69,7 +67,7 @@ public class UserService {
   public UserDTO getUserWithDTO(String id) {
     Optional<User> user = userRepository.findById(id);
     if (user.isEmpty()) {
-      throw new CustomException(ErrorCode.NOT_FOUND, "유저를 찾을 수 없습니다.");
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
 
     return user.map(UserDTO::new).get();
@@ -92,7 +90,7 @@ public class UserService {
     Optional<User> isExist = getUserByName(props.getName());
 
     if (isExist.isPresent()) {
-      throw new CustomException(ErrorCode.CONFLICT, "이미 " + props.getName() + "을 사용 중인 유저가 존재합니다.");
+      throw new UserException(UserErrorCode.USER_EXIST);
     }
 
     User user = userRepository.save(props.hashPassword(passwordEncoder).toEntity());

@@ -2,8 +2,6 @@ package kyoongdev.kyoongdevspring.modules.auth.service;
 
 import kyoongdev.kyoongdevspring.common.auth.JwtProvider;
 import kyoongdev.kyoongdevspring.common.ResponseWithIdDTO;
-import kyoongdev.kyoongdevspring.common.exception.CustomException;
-import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.auth.dto.LoginDTO;
 import kyoongdev.kyoongdevspring.modules.auth.dto.TokenDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.CreateUserDTO;
@@ -31,7 +29,7 @@ public class AuthService {
     UserDetailDTO user = this.userService.findUserByEmail(props.getEmail());
 
     if (!user.checkPassword(props.getPassword(), this.passwordEncoder)) {
-      throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호가 틀렸습니다.");
+      throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
     }
 
     return jwtProvider.generateToken(user.getId());

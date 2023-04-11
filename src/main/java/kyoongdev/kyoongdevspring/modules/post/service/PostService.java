@@ -3,8 +3,6 @@ package kyoongdev.kyoongdevspring.modules.post.service;
 
 import kyoongdev.kyoongdevspring.common.PagingDTO;
 import kyoongdev.kyoongdevspring.common.ResponseWithIdDTO;
-import kyoongdev.kyoongdevspring.common.exception.CustomException;
-import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.post.dto.CreatePostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.PostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.UpdatePostDTO;
@@ -16,7 +14,6 @@ import kyoongdev.kyoongdevspring.modules.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +36,7 @@ public class PostService {
 
   public Post findPostById(String id) {
     return postRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "게시글을 찾을 수 없습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
   }
 
   public PagingDTO<PostDTO> getPosts(Pageable pageable) {
@@ -63,7 +60,7 @@ public class PostService {
   public PostDTO getPostWithDTO(String id) {
     Optional<Post> post = postRepository.findById(id);
     if (post.isEmpty()) {
-      throw new CustomException(ErrorCode.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+      throw new IllegalArgumentException("게시글을 찾을 수 없습니다.");
     }
 
     return post.map(PostDTO::new).get();

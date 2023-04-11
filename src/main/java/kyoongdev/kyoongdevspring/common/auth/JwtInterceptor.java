@@ -2,9 +2,6 @@ package kyoongdev.kyoongdevspring.common.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import javax.naming.AuthenticationException;
-import kyoongdev.kyoongdevspring.common.exception.CustomException;
-import kyoongdev.kyoongdevspring.common.exception.ErrorCode;
 import kyoongdev.kyoongdevspring.modules.user.entity.User;
 import kyoongdev.kyoongdevspring.modules.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +26,11 @@ public class JwtInterceptor implements HandlerInterceptor {
       throws Exception {
     String token = authorizationExtractor.extract(request, "Bearer");
     if (token.isEmpty()) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED, "Token is empty");
+      throw new IllegalArgumentException("Token is empty");
     }
 
     if (!jwtProvider.validateToken(token)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED, "Token is invalid");
+      throw new IllegalArgumentException("Token is invalid");
     }
 
     String userId = jwtProvider.getAuthentication(token);
