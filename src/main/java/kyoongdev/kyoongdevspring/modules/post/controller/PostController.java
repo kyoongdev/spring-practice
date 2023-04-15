@@ -14,8 +14,10 @@ import kyoongdev.kyoongdevspring.modules.post.dto.CreatePostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.PostDTO;
 import kyoongdev.kyoongdevspring.modules.post.dto.UpdatePostDTO;
 import kyoongdev.kyoongdevspring.modules.post.service.PostService;
+import kyoongdev.kyoongdevspring.utils.aop.UserRole;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,6 +39,7 @@ public class PostController {
       @ApiResponse(responseCode = "400", description = "Bad Request")
   })
   @GetMapping()
+  @UserRole
   PagingDTO<PostDTO> findPosts(Pageable pageable) {
     return postService.getPosts(pageable);
   }
