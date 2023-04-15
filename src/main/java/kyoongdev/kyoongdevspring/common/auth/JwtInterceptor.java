@@ -9,43 +9,39 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-
 public class JwtInterceptor implements HandlerInterceptor {
 
-  @Autowired
-  private JwtProvider jwtProvider;
-  @Autowired
-  private UserService userService;
+  private final JwtProvider jwtProvider;
+  private final UserService userService;
+
+  private final AuthorizationExtractor authorizationExtractor;
 
   @Autowired
-  private AuthorizationExtractor authorizationExtractor;
+  public JwtInterceptor(JwtProvider jwtProvider, UserService userService,
+      AuthorizationExtractor authorizationExtractor) {
+    this.jwtProvider = jwtProvider;
+    this.userService = userService;
+    this.authorizationExtractor = authorizationExtractor;
+  }
 
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
     String token = authorizationExtractor.extract(request, "Bearer");
-    if (token.isEmpty()) {
-      throw new IllegalArgumentException("Token is empty");
+    if (!token.isEmpty()) {
+      if (!jwtProvider.validateToken(token)) {
+        throw new IllegalArgumentException("Token is invalid");
+      }
+
+      String userId = jwtProvider.getAuthentication(token);
+      User user = userService.findUserById(userId);
+
+      request.setAttribute("user", user);
     }
-
-    if (!jwtProvider.validateToken(token)) {
-      throw new IllegalArgumentException("Token is invalid");
-    }
-
-    String userId = jwtProvider.getAuthentication(token);
-    User user = userService.findUserById(userId);
-
-    request.setAttribute("user", user);
 
     return true;
   }
 
-  private void verifyToken(String givenToken, String membersToken) {
-    if (!givenToken.equals(membersToken)) {
-      throw new IllegalArgumentException("사용자의 Token과 일치하지 않습니다.");
-    }
-//   jwtProvider.verifyToken(givenToken);
-  }
 
 }
