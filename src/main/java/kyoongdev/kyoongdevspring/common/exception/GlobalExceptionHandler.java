@@ -14,8 +14,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BaseException.class)
   protected ResponseEntity<ExceptionDTO> handleCustomException(BaseException e) {
 
-    return ExceptionDTO.toResponseEntity(e.getExceptionCodeInterface()
-    );
+    return ExceptionDTO.toResponseEntity(e.getExceptionCodeInterface());
   }
 
   @ExceptionHandler(Exception.class)
@@ -28,6 +27,7 @@ public class GlobalExceptionHandler {
 
   }
 
+  // 로그인 성공 -> accessToken & refreshToken -> FE -> accessToken & refreshToken (http headers) -> Sever
   @ExceptionHandler(JpaSystemException.class)
   protected ResponseEntity<ExceptionDTO> handleJPAException(final JpaSystemException e) {
 

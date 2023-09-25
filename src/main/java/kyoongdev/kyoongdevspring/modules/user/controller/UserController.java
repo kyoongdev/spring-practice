@@ -18,6 +18,7 @@ import kyoongdev.kyoongdevspring.modules.user.dto.UpdateUserDTO;
 import kyoongdev.kyoongdevspring.modules.user.dto.UserDTO;
 import kyoongdev.kyoongdevspring.modules.user.entity.User;
 import kyoongdev.kyoongdevspring.modules.user.service.UserService;
+import kyoongdev.kyoongdevspring.utils.aop.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,54 +36,56 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    public final UserService userService;
 
-    @Autowired
-    UserController(UserService userService) {
-        this.userService = userService;
-    }
+  public final UserService userService;
 
-    @Operation(summary = "유저 조회", description = "유저 조회 메서드입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
-    @GetMapping()
-    PagingDTO<UserDTO> findUsers(Pageable pageable) {
-        return userService.getUsers(pageable);
-    }
+  @Autowired
+  UserController(UserService userService) {
+    this.userService = userService;
+  }
 
-    @Operation(summary = "유저 조회", description = "유저 조회 메서드입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
-    @GetMapping("{id}")
-    UserDTO findUser(@PathVariable("id") String id) {
-        return userService.getUserWithDTO(id);
-    }
+  @Operation(summary = "유저 조회", description = "유저 조회 메서드입니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+      @ApiResponse(responseCode = "400", description = "Bad Request")
+  })
+  @GetMapping()
+  PagingDTO<UserDTO> findUsers(Pageable pageable) {
+    return userService.getUsers(pageable);
+  }
 
-    @Operation(summary = "유저 생성", description = "유저 생성 메서드입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "생성 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseWithIdDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    ResponseWithIdDTO createUser(@RequestBody CreateUserDTO user) {
-        return userService.createUser(user);
-    }
+  @Operation(summary = "유저 조회", description = "유저 조회 메서드입니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+      @ApiResponse(responseCode = "400", description = "Bad Request")
+  })
+  @GetMapping("{id}")
+  UserDTO findUser(@PathVariable("id") String id) {
+    return userService.getUserWithDTO(id);
+  }
 
-    @PatchMapping("{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void updateUser(@PathVariable("id") String id, @RequestBody UpdateUserDTO user) {
-        userService.updateUser(id, user);
-    }
+  @Operation(summary = "유저 생성", description = "유저 생성 메서드입니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "생성 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseWithIdDTO.class))),
+      @ApiResponse(responseCode = "400", description = "Bad Request")
+  })
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  ResponseWithIdDTO createUser(@RequestBody CreateUserDTO user) {
+    return userService.createUser(user);
+  }
 
-    @DeleteMapping("{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteUser(@PathVariable("id") String id) {
-        userService.deleteUser(id);
-    }
+  @PatchMapping("{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @UserRole
+  void updateUser(@PathVariable("id") String id, @RequestBody UpdateUserDTO user) {
+    userService.updateUser(id, user);
+  }
+
+  @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  void deleteUser(@PathVariable("id") String id) {
+    userService.deleteUser(id);
+  }
 
 }

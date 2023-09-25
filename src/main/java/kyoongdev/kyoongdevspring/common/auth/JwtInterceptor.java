@@ -29,6 +29,7 @@ public class JwtInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
     String token = authorizationExtractor.extract(request, "Bearer");
+
     if (!token.isEmpty()) {
       if (!jwtProvider.validateToken(token)) {
         throw new IllegalArgumentException("Token is invalid");

@@ -17,5 +17,4 @@ public class CommonException extends BaseException {
     return errorCodeInterface;
   }
 
-
 }

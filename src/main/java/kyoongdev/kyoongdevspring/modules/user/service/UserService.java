@@ -41,6 +41,8 @@ public class UserService {
 
   public User findUserById(String id) {
     Optional<User> user = userRepository.findById(id);
+
+    //에러 핸들링
     if (user.isEmpty()) {
       throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
